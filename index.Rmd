@@ -1,34 +1,100 @@
 --- 
-title: "A Minimal Book Example"
-author: "Yihui Xie"
+title: "Notes on 'Deep Learning with R'"
+author: "Indrajeet Patil"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
 bibliography: [book.bib, packages.bib]
 biblio-style: apalike
 link-citations: yes
-description: "This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook."
+description: "These are my notes while reading the book `Deep Learning with R` by Francois Chollet and J.J.Allaire"
 ---
 
 # Prerequisites
 
-This is a _sample_ book written in **Markdown**. You can use anything that Pandoc's Markdown supports, e.g., a math equation $a^2 + b^2 = c^2$.
+Before starting with the examples included in this book, I found it useful to
+first clear up few basic concepts needed for data representation in R.
 
-The **bookdown** package can be installed from CRAN or Github:
+## Tensors
 
-```{r eval=FALSE}
-install.packages("bookdown")
-# or the development version
-# devtools::install_github("rstudio/bookdown")
+Deep learning involves data processing through layers of neural networks. So, of
+course, the first question is what's the data structure and is it supported in
+`R`? The basic data structure in machine learning world is **tensor**, which is
+a generalization of vectors and matrices to higher dimensions (**D**). Tensors can be
+constructed in `R` using `array` function.
+
+There are no *scalars* (or **0D** tensors) in `R`, but a vector of length one is
+conceptually similar to a scalar.
+
+```{r scalar}
+# creating the data structure
+x0 <- 2
+
+# checking its attributes
+str(x0)
+dim(as.array(x0))
+typeof(x0)
 ```
 
-Remember each Rmd file contains one and only one chapter, and a chapter is defined by the first-level heading `#`.
+Vectors have a single dimension (or they are **1D** tensors).
 
-To compile this example to PDF, you need XeLaTeX. You are recommended to install TinyTeX (which includes XeLaTeX): <https://yihui.name/tinytex/>.
+```{r vector}
+# creating the data structure
+x1 <- c(2, -3, 5, 66)
 
-```{r include=FALSE}
-# automatically create a bib database for R packages
-knitr::write_bib(c(
-  .packages(), 'bookdown', 'knitr', 'rmarkdown'
-), 'packages.bib')
+# checking its attributes
+str(x1)
+dim(as.array(x1))
+typeof(x1)
+```
+
+Note that both scalars and vectors are one-dimensional arrays in `R`.
+
+Matrices have two dimensions (or they are **2D** tensors).
+
+```{r matrix}
+# creating the data structure
+x2 <- matrix(c(1:10), nrow = 2, ncol = 5)
+
+# checking its attributes
+str(x2)
+dim(as.array(x2))
+typeof(x2)
+```
+
+If we were to imagine a cube with a collection of numbers along each of its axes, that's what a **3D** tensor would like.
+
+```{r tensor3d}
+# creating the data structure
+x3 <- array(data = c(1:24), dim = c(2, 3, 4))
+
+# what it looks like
+# (it's like stacking 2 x 3 matrices on top of each other 4 times!)
+x3
+
+# checking its attributes
+str(x3)
+dim(x3)
+typeof(x3)
+```
+
+Each tensor has three key attributes-
+
+  - *rank* (or number of dimensions/axes): `x3` is a **3D** tensor so it has a
+    rank of `r length(dim(x3))`.
+  - *shape*: Confusingly, this refers to the number of dimensions (`dim()`)
+    along each of these axes. For `x3`, this was `r dim(x3)`.
+  - *type*: Type of data contained in the tensor. For `x3`, this was
+    `r typeof(x3)`.
+
+So far we have been looking at made-up examples of tensors. Let's have a look at
+the kind of data we will encounter in a typical ML workflow. We will look at the
+MNIST dataset contained in the `keras` library.
+
+```{r mnist}
+library(keras)
+use_condaenv("r-tensorflow")
+
+mnist <- keras::dataset_mnist()
+str(mnist)
 ```
